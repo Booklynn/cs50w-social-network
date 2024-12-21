@@ -1,5 +1,25 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    <h2 class="heading-2">All Posts</h2>
+
+    {% if message %}
+    <div>{{ message }}</div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div class="blog-post border rounded text-left">
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <label class="font-weight-bold" for="new-post">New Post</label>
+            <div class="form-group">
+                <textarea class="form-control"></textarea>
+            </div>
+            <input class="btn btn-primary" type="submit" value="Post">
+        </form>
+    </div>
+    {% endif %}
+    <div class="blog-post border rounded text-left mt-2">
+        <p>test</p>
+    </div>
 {% endblock %}
