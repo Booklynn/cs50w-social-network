@@ -5,3 +5,15 @@
 .blog-post {
     padding: 10px;
 }
+
+.edit-post {
+    color: dodgerblue;
+}
+
+.edit-post:hover, .heart-icon:hover  {
+    cursor: pointer;
+}
+
+.gray-color {
+    color: gray;
+}
