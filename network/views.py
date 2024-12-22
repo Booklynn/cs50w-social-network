@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Post
+from .models import User, Post, Follow
 
 
 def index(request):
@@ -92,8 +92,37 @@ def post(request):
 
 
 def profile(request, user_id):
-    user = User.objects.get(id=user_id)
+    try:
+        user_profile = User.objects.get(id=user_id)
+        followers = Follow.objects.filter(followed=user_profile)
+        following = Follow.objects.filter(follower=user_profile)
+    
+    except User.DoesNotExist:
+        return HttpResponseRedirect(reverse("index"))
+
     return render(request, "network/profile.html", {
-        "user_profile_name": user,
-        "posts": Post.objects.filter(user=user).order_by('-id')
+        "user_profile": user_profile,
+        "followers_count": followers.count(),
+        "following_count": following.count(),
+        "followers": [follow.follower for follow in followers],
+        "following": [follow.followed for follow in following],
+        "posts": Post.objects.filter(user=user_profile).order_by('-id')
     })
+
+
+@login_required(login_url='/login')
+def follow(request, user_id):
+    followed_user = get_object_or_404(User, id=user_id)
+
+    if request.user != followed_user:
+        Follow.objects.get_or_create(follower=request.user, followed=followed_user)
+    return redirect('profile', user_id=user_id)
+
+
+@login_required(login_url='/login')
+def unfollow(request, user_id):
+    followed_user = get_object_or_404(User, id=user_id)
+
+    if request.user != followed_user:
+        Follow.objects.filter(follower=request.user, followed=followed_user).delete()
+    return redirect('profile', user_id=user_id)

@@ -1,17 +1,27 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    <h2 class="heading-2">{{ user_profile_name }}</h2>
+    <h2 class="heading-2">{{ user_profile }}</h2>
 
     {% if user.is_authenticated %}
-        {% if user != user_profile_name %}
-            <button class="btn btn-primary w-25">Follow</button>
-        {% endif %} 
+        {% if user != user_profile %}
+            {% if user in followers %}
+                <form method="post" action="{% url 'unfollow' user_profile.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-secondary w-25" type="submit">Unfollow</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'follow' user_profile.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary w-25" type="submit">Follow</button>
+                </form>
+            {% endif %}
+        {% endif %}
     {% endif %}
     
     <div class="d-flex justify-content-center mt-2">
-        <p class="mr-3">0 followers</p>
-        <p>0 following</p>
+        <p class="mr-3">{{ followers_count }} followers</p>
+        <p>{{ following_count }} following</p>
     </div>
     {% for data in posts %}
         {% include 'network/blog_post_card.html' %}
