@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -9,8 +10,12 @@ from .models import User, Post, Follow
 
 
 def index(request):
+    posts = Post.objects.all().order_by('-id')
+    
+    page_obj = get_page_obj(request, posts)
+    
     return render(request, "network/index.html", {
-        "posts": Post.objects.all().order_by('-id')
+        'page_obj': page_obj
     })
 
 
@@ -96,6 +101,9 @@ def profile(request, user_id):
         user_profile = User.objects.get(id=user_id)
         followers = Follow.objects.filter(followed=user_profile)
         following = Follow.objects.filter(follower=user_profile)
+
+        posts = Post.objects.filter(user=user_profile).order_by('-id')
+        page_obj = get_page_obj(request, posts)
     
     except User.DoesNotExist:
         return HttpResponseRedirect(reverse("index"))
@@ -106,7 +114,7 @@ def profile(request, user_id):
         "following_count": following.count(),
         "followers": [follow.follower for follow in followers],
         "following": [follow.followed for follow in following],
-        "posts": Post.objects.filter(user=user_profile).order_by('-id')
+        "page_obj": page_obj
     })
 
 
@@ -132,7 +140,16 @@ def unfollow(request, user_id):
 def following(request):
     following_users = Follow.objects.filter(follower=request.user).values_list('followed', flat=True)
     posts = Post.objects.filter(user__id__in=following_users).order_by('-id')
-
+    
+    page_obj = get_page_obj(request, posts)
+    
     return render(request, "network/following.html", {
-        "posts": posts
+        'page_obj': page_obj
     })
+
+
+def get_page_obj(request, obj, per_page=10):
+    paginator = Paginator(obj, per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return page_obj

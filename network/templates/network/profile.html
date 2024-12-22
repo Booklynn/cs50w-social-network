@@ -23,7 +23,10 @@
         <p class="mr-3">{{ followers_count }} followers</p>
         <p>{{ following_count }} following</p>
     </div>
-    {% for data in posts %}
+    
+    {% for data in page_obj %}
         {% include 'network/blog_post_card.html' %}
     {% endfor %}
+
+    {% include 'network/pagination.html' %}
 {% endblock %}

@@ -9,9 +9,10 @@
     {% endif %}
 
     {% if user.is_authenticated %}
-        {% for data in posts %}
+        {% for data in page_obj %}
             {% include 'network/blog_post_card.html' %}
         {% endfor %}
     {% endif %}
 
+    {% include 'network/pagination.html' %}
 {% endblock %}

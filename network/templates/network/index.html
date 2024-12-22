@@ -20,7 +20,9 @@
         </div>
     {% endif %}
 
-    {% for data in posts %}
+    {% for data in page_obj %}
         {% include 'network/blog_post_card.html' %}
     {% endfor %}
+
+    {% include 'network/pagination.html' %}
 {% endblock %}
