@@ -89,3 +89,11 @@ def post(request):
         return HttpResponseRedirect(reverse("index"))
 
     return render(request, "index.html")
+
+
+def profile(request, user_id):
+    user = User.objects.get(id=user_id)
+    return render(request, "network/profile.html", {
+        "user_profile_name": user,
+        "posts": Post.objects.filter(user=user).order_by('-id')
+    })
