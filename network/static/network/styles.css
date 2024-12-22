@@ -17,3 +17,9 @@
 .gray-color {
     color: gray;
 }
+
+.username-link {
+    display: block; 
+    color: black; 
+    text-decoration: none !important;
+}

@@ -1,0 +1,14 @@
+<div class="blog-post border rounded text-left mt-2 mb-2">
+    <a href="{% url 'profile' data.user.id %}" class="username-link font-weight-bold mb-1">{{ data.user }}</a>
+    <span class="gray-color"><small>{{ data.date|date:"F j, Y, g:i a" }}</small>
+        {% if data.user == user %}
+            <small> | </small>
+            <small class="edit-post">Edit</small>
+        {% endif %}
+    </span>    
+    <p class="mt-1 mb-2">{{ data.post }}</p>
+    <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 512 512">
+        <path fill="#ff0000" d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/></svg>
+    <span class="gray-color">0</span>
+    <p class="mb-1 gray-color"><small>Comment</small></p>
+</div>
