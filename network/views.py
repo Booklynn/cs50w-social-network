@@ -126,3 +126,13 @@ def unfollow(request, user_id):
     if request.user != followed_user:
         Follow.objects.filter(follower=request.user, followed=followed_user).delete()
     return redirect('profile', user_id=user_id)
+
+
+@login_required(login_url='/login')
+def following(request):
+    following_users = Follow.objects.filter(follower=request.user).values_list('followed', flat=True)
+    posts = Post.objects.filter(user__id__in=following_users).order_by('-id')
+
+    return render(request, "network/following.html", {
+        "posts": posts
+    })

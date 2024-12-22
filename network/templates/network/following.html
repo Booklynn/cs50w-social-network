@@ -1,0 +1,17 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+    <h2 class="heading-2">Following</h2>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        {% for data in posts %}
+            {% include 'network/blog_post_card.html' %}
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}
