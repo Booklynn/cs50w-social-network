@@ -1,12 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Post, Follow
+from .models import User, Post, Follow, Like
 
 
 def index(request):
@@ -153,3 +154,45 @@ def get_page_obj(request, obj, per_page=10):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return page_obj
+
+
+@csrf_exempt
+@login_required(login_url='/login')
+def update_post(request, post_id):
+    if request.method == "POST":
+        new_content = request.POST.get("post", "").strip()
+        if not new_content:
+            return JsonResponse({"message": "Post content cannot be empty."}, status=400)
+
+        post = get_object_or_404(Post, id=post_id, user=request.user)
+
+        try:
+            post.post = new_content
+            post.save()
+
+            return JsonResponse({"message": "Post updated successfully."}, status=200)
+        except Exception as e:
+            return JsonResponse({"message": f"An error occurred: {str(e)}"}, status=500)
+
+    return JsonResponse({"message": "Invalid request method."}, status=400)
+
+
+@csrf_exempt
+@login_required(login_url='/login')
+def toggle_like(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
+
+        existing_like = Like.objects.filter(user=request.user, post=post).first()
+
+        if existing_like:
+            existing_like.delete()
+            is_liked = False
+        else:
+            Like.objects.create(user=request.user, post=post)
+            is_liked = True
+
+        like_count = post.likes.count()
+        return JsonResponse({'is_liked': is_liked, 'like_count': like_count})
+    
+    return JsonResponse({"message": "Invalid request method."}, status=400)
