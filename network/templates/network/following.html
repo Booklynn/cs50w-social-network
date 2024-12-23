@@ -9,10 +9,14 @@
     {% endif %}
 
     {% if user.is_authenticated %}
-        {% for data in page_obj %}
-            {% include 'network/blog_post_card.html' %}
-        {% endfor %}
+        {% if page_obj.object_list|length > 0 %}
+            {% for data in page_obj %}
+                {% include 'network/blog_post_card.html' %}
+            {% endfor %}
+            {% include 'network/pagination.html' %}
+        {% else %}
+            <p>You are not following anyone yet.</p>
+        {% endif %}
+        
     {% endif %}
-
-    {% include 'network/pagination.html' %}
 {% endblock %}

@@ -28,5 +28,9 @@
         {% include 'network/blog_post_card.html' %}
     {% endfor %}
 
-    {% include 'network/pagination.html' %}
+    {% if page_obj.object_list|length > 0 %}
+        {% include 'network/pagination.html' %}
+    {% else %}
+        <p>You are not posting yet.</p>
+    {% endif %}
 {% endblock %}
